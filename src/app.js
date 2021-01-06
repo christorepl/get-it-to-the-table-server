@@ -22,7 +22,7 @@ app.use('/bga-auth', require('./routes/bga-auth'))
 
 
 
-app.use((error, req, res, next) =>{
+app.use((error, req, res) =>{
     res.setHeader('Access-Control-Allow-Origin', CLIENT_ORIGIN);
     let response
     if (process.env.NODE_ENV === 'production') {
@@ -31,9 +31,9 @@ app.use((error, req, res, next) =>{
       response = { error }
     }
     res.status(500).json(response)
-  })
+})
 
-app.use(function errorHandler(error, req, res, next) {
+app.use(function errorHandler(error, req, res) {
     let response
     if (NODE_ENV === 'production') {
         response = { error: { message: 'server error' } }
