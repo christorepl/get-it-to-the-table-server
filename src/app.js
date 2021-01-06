@@ -4,7 +4,7 @@ const morgan = require('morgan')
 const cors = require('cors')
 const helmet = require('helmet')
 const app = express()
-const { NODE_ENV } = require('./config')
+const { NODE_ENV, CLIENT_ID } = require('./config')
 const morganOption = (NODE_ENV === 'production')
   ? 'tiny'
   : 'common';
@@ -13,12 +13,13 @@ app.use(helmet())
 app.use(cors())
 
 app.get('/', (req, res) => {
-    res.json('Hello, world!')
+    res.json('Hello, world! Welcome to the Get it to the Table API!')
 })
 
-app.get('/bga-auth', (req, res) => {
-    res.json('bga auth')
-})
+app.use('/bga-auth', require('./routes/bga-auth'))
+
+
+
 
 app.use(function errorHandler(error, req, res, next) {
     let response
