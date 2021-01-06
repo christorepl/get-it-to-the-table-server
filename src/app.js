@@ -15,12 +15,12 @@ app.use(cors({
 }))
 
 app.get('/', (req, res) => {
-    res.json('Hello, world! Welcome to the Get it to the Table API!')
+    res.send('Hello, world! Welcome to the Get it to the Table API!')
 })
 
 app.use('/bga-auth', require('./routes/bga-auth'))
 
-
+// app.get
 
 
 
