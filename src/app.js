@@ -12,7 +12,7 @@ app.use(morgan(morganOption))
 app.use(helmet())
 app.use(express.json())
 app.use(cors({
-    origin: process.env.CLIENT_ORIGIN
+    origin: 'https://get-it-to-the-table.vercel.app/'
 }))
 
 app.get('/', (req, res) => {
