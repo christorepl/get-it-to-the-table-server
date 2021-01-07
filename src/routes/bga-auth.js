@@ -3,6 +3,7 @@ const { CLIENT_ID, CLIENT_SECRET, REDIRECT_URI, GRANT_TYPE, STATE } = require('.
 const fetch = require('node-fetch')
 const axios = require("axios")
 const Querystring = require('querystring')
+const qs = require('qs')
 
 router.post("/auth", (req, res, next) => {
     console.log('request received')
@@ -32,6 +33,7 @@ router.post("/auth", (req, res, next) => {
 
     axios.post('https://api.boardgameatlas.com/oauth/token', body, config)
         .then(response => console.log(response))
+        .catch(error => console.error(error, 'that was the error')
 
 
 
