@@ -14,42 +14,48 @@ router.post("/auth", async (req, res, next) => {
     let grant_type ="authorization_code"
     let body = `client_id=${client_id}&client_secret=${client_secret}&redirect_uri=${redirect_uri}&grant_type=${grant_type}&code=${code}`
     console.log('body string: ', body)
-    var options = {
-        method: 'POST',
-        url: 'https://get-it-to-the-table.vercel.app/bga-auth/',
+
+    fetch('https://api.boardgameatlas.com/oauth/token', {
+        method: "POST",
         headers: {
             "content-type": "application/x-www-form-urlencoded"
         },
         body
-    }
-    console.log('options ', options)
-
-    axios.request(options).then(function (response) {
-        console.log(response)
-        res.json(response)
+    }).then(response => {
+        if (response.ok) {
+            response.json().then(json => {
+                console.log('success')
+                res.json(json).status(200)
+            })
+        }
     }).catch(function(error) {
-        console.error('server error', error, 'poop')
+        console.log('server error ', error, 'pooped out at error')
     })
 
 
 
-
-    // var options = {
-    //     method: 'POST',
-    //     url: 'https://api.boardgameatlas.com/oauth/token',
-    //     headers: {
-    //         "content-type": "application/x-www-form-urlencoded"
-    //     },
-    //     body:
-    //     `client_id=LN1xFTrB6e&client_secret=17c218619e19b928562296f2edbdc711&redirect_uri=https://get-it-to-the-table.vercel.app/bga-auth/&grant_type=authorization code&code=${code}`
-    // }
-
-    // axios.request(options).then(function (response) {
-    //     res.json(response)
-    // }).catch(function (error) {
-    //     console.error(error)
-    // })
 })
+
+
+
+// var options = {
+//     method: 'POST',
+//     url: 'https://get-it-to-the-table.vercel.app/bga-auth/',
+//     headers: {
+//         "content-type": "application/x-www-form-urlencoded"
+//     },
+//     body
+// }
+// console.log('options ', options)
+
+// axios.request(options).then(function (response) {
+//     console.log(response)
+//     res.json(response)
+// }).catch(function(error) {
+//     console.error('server error', error, 'poop')
+// })
+
+
 
 module.exports = router
 
