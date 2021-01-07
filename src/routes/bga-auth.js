@@ -33,7 +33,7 @@ router.post("/auth", (req, res, next) => {
 
     axios.post('https://api.boardgameatlas.com/oauth/token', body, config)
         .then(response => console.log(response))
-        .catch(error => console.error(error, 'that was the error')
+        .catch(error => console.error(error, 'that was the error'))
 
 
 
