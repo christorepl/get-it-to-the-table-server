@@ -22,6 +22,7 @@ router.post("/auth", async (req, res, next) => {
         if (response.ok) {
             response.json().then(json => {
                 console.log(json)
+                res.json(json)
             })
         }
     }).catch(function(error) {
