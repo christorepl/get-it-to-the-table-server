@@ -6,6 +6,7 @@ const axios = require("axios").default;
 router.post("/auth", async (req, res, next) => {
     console.log('request received')
     console.log('here is the body', req.body.code)
+    console.log('that was req.body.code')
     let code = req.body.code
     let client_id= "LN1xFTrB6e"
     let client_secret = "17c218619e19b928562296f2edbdc711"
@@ -19,7 +20,7 @@ router.post("/auth", async (req, res, next) => {
         headers: {
             "content-type": "application/x-www-form-urlencoded"
         },
-        body: JSON.stringify(body)
+        body
     }
     console.log('options ', options)
 
