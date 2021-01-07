@@ -4,6 +4,7 @@ const axios = require("axios").default;
 
 router.post("/auth", async (req, res, next) => {
     console.log('here is the body', req.body.code)
+    const code = req.body.code
     var options = {
         method: 'POST',
         url: 'https://api.boardgameatlas.com/oauth/token',
