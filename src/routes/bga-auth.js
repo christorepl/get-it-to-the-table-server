@@ -2,7 +2,7 @@ const router = require('express').Router()
 const { CLIENT_ID, CLIENT_SECRET, REDIRECT_URI, GRANT_TYPE, STATE } = require('../config')
 const axios = require("axios").default;
 
-router.post('/auth', (req, res, next) => {
+router.post("/auth", async (req, res, next) => {
     var options = {
         method: 'POST',
         url: 'https://api.boardgameatlas.com/oauth/token',
@@ -19,6 +19,8 @@ router.post('/auth', (req, res, next) => {
         console.error(error)
     })
 })
+
+module.exports = router
 
 
 
