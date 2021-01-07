@@ -1,8 +1,6 @@
 const router = require('express').Router()
-const { CLIENT_ID, CLIENT_SECRET, REDIRECT_URI, GRANT_TYPE, STATE } = require('../config')
-const fetch = require('node-fetch')
+const { CLIENT_ID, CLIENT_SECRET, REDIRECT_URI, GRANT_TYPE } = require('../config')
 const axios = require("axios")
-const Querystring = require('querystring')
 const qs = require('qs')
 const authURL = 'https://api.boardgameatlas.com/oauth/token'
 
@@ -11,10 +9,10 @@ router.post("/auth", (req, res, next) => {
     console.log('here is the body', req.body.code)
     console.log('that was req.body.code')
     let code = req.body.code
-    let client_id= "LN1xFTrB6e"
-    let client_secret = "17c218619e19b928562296f2edbdc711"
-    let redirect_uri= "https://get-it-to-the-table.vercel.app/bga-auth/"
-    let grant_type ="authorization_code"
+    let client_id = CLIENT_ID
+    let client_secret = CLIENT_SECRET
+    let redirect_uri = REDIRECT_URI
+    let grant_type = GRANT_TYPE
     axios({
         method: 'POST',
         url: authURL,

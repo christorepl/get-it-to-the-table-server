@@ -21,6 +21,7 @@ app.get('/', (req, res) => {
 })
 
 app.use('/bga-auth', require('./routes/bga-auth'))
+app.use('/auth', require('./routes/jwtAuth'))
 
 // app.use(function(req, res, next) {
 //     res.header("Access-Control-Allow-Origin", CLIENT_ORIGIN);
