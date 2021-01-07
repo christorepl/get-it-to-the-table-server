@@ -12,7 +12,7 @@ router.post("/auth", async (req, res, next) => {
             "content-type": "application/x-www-form-urlencoded"
         },
         body:
-        `client_id=${CLIENT_ID}&client_secret=${CLIENT_SECRET}&redirect_uri=${REDIRECT_URI}&grant_type=${GRANT_TYPE}&code=${code}`
+        `client_id=LN1xFTrB6e&client_secret=17c218619e19b928562296f2edbdc711&redirect_uri=https://get-it-to-the-table.vercel.app/bga-auth/&grant_type=authorization code&code=${code}`
     }
 
     axios.request(options).then(function (response) {
