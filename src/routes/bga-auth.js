@@ -4,33 +4,31 @@ const fetch = require('node-fetch')
 const axios = require("axios").default;
 
 router.post("/auth", async (req, res, next) => {
+    console.log('request received')
     console.log('here is the body', req.body.code)
     let code = req.body.code
-
     let client_id= "LN1xFTrB6e"
     let client_secret = "17c218619e19b928562296f2edbdc711"
     let redirect_uri= "https://get-it-to-the-table.vercel.app/bga-auth/"
     let grant_type ="authorization_code"
-    fetch('https://api.boardgameatlas.com/oauth/token', {
-        method: "POST",
+    let body = `client_id=${client_id}&client_secret=${client_secret}&redirect_uri=${redirect_uri}&grant_type=${grant_type}&code=${code}`
+    console.log('body string: ', body)
+    var options = {
+        method: 'POST',
+        url: 'https://get-it-to-the-table.vercel.app/bga-auth/',
         headers: {
             "content-type": "application/x-www-form-urlencoded"
         },
-        body: 
-            `client_id=${client_id}&client_secret=${client_secret}&redirect_uri=${redirect_uri}&grant_type=${grant_type}&code=${code}`
-    }).then(response => {
-        if (response.ok) {
-            response.json().then(json => {
-                console.log(json)
-                res.json(json)
-            })
-        }
+        body: JSON.stringify(body)
+    }
+    console.log('options ', options)
+
+    axios.request(options).then(function (response) {
+        console.log(response)
+        res.json(response)
     }).catch(function(error) {
-        console.log(error)
+        console.error('server error', error)
     })
-
-
-
 
 
 
