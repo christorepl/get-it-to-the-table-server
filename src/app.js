@@ -31,7 +31,7 @@ app.use('/bga-auth', require('./routes/bga-auth'))
 
 
 app.use((error, req, res, next) =>{
-    res.setHeader('Access-Control-Allow-Origin', process.env.CLIENT_ORIGIN);
+    res.setHeader('Access-Control-Allow-Origin', 'https://get-it-to-the-table.vercel.app/');
     let response
     if (process.env.NODE_ENV === 'production') {
       response = { error: { message: 'Server Error' }}
