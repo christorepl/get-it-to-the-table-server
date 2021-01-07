@@ -4,22 +4,50 @@ const axios = require("axios").default;
 
 router.post("/auth", async (req, res, next) => {
     console.log('here is the body', req.body.code)
-    const code = req.body.code
-    var options = {
-        method: 'POST',
-        url: 'https://api.boardgameatlas.com/oauth/token',
+    let code = req.body.code
+
+    let client_id= "LN1xFTrB6e"
+    let client_secret = "17c218619e19b928562296f2edbdc711"
+    let redirect_uri= "https://get-it-to-the-table.vercel.app/bga-auth/"
+    let grant_type ="authorization_code"
+    fetch('https://api.boardgameatlas.com/oauth/token', {
+        method: "POST",
         headers: {
             "content-type": "application/x-www-form-urlencoded"
         },
-        body:
-        `client_id=LN1xFTrB6e&client_secret=17c218619e19b928562296f2edbdc711&redirect_uri=https://get-it-to-the-table.vercel.app/bga-auth/&grant_type=authorization code&code=${code}`
-    }
-
-    axios.request(options).then(function (response) {
-        res.json(response)
-    }).catch(function (error) {
-        console.error(error)
+        body: 
+            `client_id=${client_id}&client_secret=${client_secret}&redirect_uri=${redirect_uri}&grant_type=${grant_type}&code=${code}`
+    }).then(response => {
+        if (response.ok) {
+            response.json().then(json => {
+                console.log(json)
+            })
+        }
+    }).catch(function(error) {
+        console.log(error)
     })
+
+
+
+
+
+
+
+    // var options = {
+    //     method: 'POST',
+    //     url: 'https://api.boardgameatlas.com/oauth/token',
+    //     headers: {
+    //         "content-type": "application/x-www-form-urlencoded"
+    //     },
+    //     body:
+    //     `client_id=LN1xFTrB6e&client_secret=17c218619e19b928562296f2edbdc711&redirect_uri=https://get-it-to-the-table.vercel.app/bga-auth/&grant_type=authorization code&code=${code}`
+    // }
+
+    // axios.request(options).then(function (response) {
+    //     res.json(response)
+    // }).catch(function (error) {
+    //     console.error(error)
+    // })
 })
 
 module.exports = router
