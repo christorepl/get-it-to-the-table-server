@@ -13,7 +13,7 @@ app.use(helmet())
 app.use(express.json())
 
 app.use(cors({
-    origin: CLIENT_ORIGIN,
+    origin: process.env.CLIENT_ORIGIN,
   }))
   
 app.get('/', (req, res) => {
@@ -32,7 +32,7 @@ app.use('/bga-auth', require('./routes/bga-auth'))
 
 
 app.use((error, req, res, next) =>{
-    res.setHeader('Access-Control-Allow-Origin', CLIENT_ORIGIN);
+    res.setHeader('Access-Control-Allow-Origin', process.env.CLIENT_ORIGIN);
     let response
     if (process.env.NODE_ENV === 'production') {
       response = { error: { message: 'Server Error' }}
