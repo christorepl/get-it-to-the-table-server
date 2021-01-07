@@ -3,7 +3,7 @@ const { CLIENT_ID, CLIENT_SECRET, REDIRECT_URI, GRANT_TYPE, STATE } = require('.
 const axios = require("axios").default;
 
 router.post("/auth", async (req, res, next) => {
-    console.log('here is the body', req.body)
+    console.log('here is the body', req.body.code)
     var options = {
         method: 'POST',
         url: 'https://api.boardgameatlas.com/oauth/token',
@@ -22,8 +22,6 @@ router.post("/auth", async (req, res, next) => {
 })
 
 module.exports = router
-
-
 
 // router.post('/', (req, res, next) => {
 //     fetch('https://api.boardgameatlas.com/oauth/token', {
