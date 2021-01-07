@@ -28,7 +28,7 @@ router.post("/auth", async (req, res, next) => {
         console.log(response)
         res.json(response)
     }).catch(function(error) {
-        console.error('server error', error)
+        console.error('server error', error, 'poop')
     })
 
 
