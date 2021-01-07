@@ -38,6 +38,7 @@
     "pg-hstore": "^2.3.3",
     "postgrator": "^4.1.1",
     "postgrator-cli": "^3.3.0",
+    "qs": "^6.9.4",
     "querystring": "^0.2.0",
     "sequelize": "^6.3.5",
     "uuid": "^8.3.1"
