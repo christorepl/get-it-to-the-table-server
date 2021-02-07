@@ -5,19 +5,10 @@ const authorization = require('../middleware/authorization')
 
 router.get('/:group_id', authorization, async (req, res) => {
     try {
-        // console.log('group id: ', req.params.group_id)
 
         // const test = await pool.query(
-        //     'SELECT swipers FROM group_games WHERE group_id = $1 AND',
+        //     "SELECT * FROM group_games WHERE group_id = $1 AND members LIKE ('%' || $2 || '%')", [req.params.group_id, req.user.id]
         // )
-
-        // console.log('poop ', test.rows)
-
-        const test = await pool.query(
-            "SELECT * FROM group_games WHERE group_id = $1 AND members LIKE ('%' || $2 || '%')", [req.params.group_id, req.user.id]
-        )
-
-        // console.log('test ', test.rows, ' checked')
 
         const user_id = req.user.id
 
