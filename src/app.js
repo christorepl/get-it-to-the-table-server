@@ -4,6 +4,10 @@ const morgan = require('morgan')
 const cors = require('cors')
 const helmet = require('helmet')
 const app = express()
+const http = require('http')
+const server = http.createServer(app)
+const socketio = require('socket.io')
+const io = socketio(server)
 const { NODE_ENV, CLIENT_ORIGIN } = require('./config')
 const morganOption = (NODE_ENV === 'production')
   ? 'tiny'
@@ -20,20 +24,24 @@ app.get('/', (req, res) => {
     res.send('Hello, world! Welcome to the Get it to the Table API!')
 })
 
-app.use('/bga-auth', require('./routes/bga-auth'))
+app.use('/bga', require('./routes/bga'))
 app.use('/auth', require('./routes/jwtAuth'))
+app.use('/contacts', require('./routes/contacts'))
+app.use('/group', require ('./routes/group'))
+app.use('/swiper', require ('./routes/swiper'))
 
-// app.use(function(req, res, next) {
-//     res.header("Access-Control-Allow-Origin", CLIENT_ORIGIN);
-//     res.header("Access-Control-Allow-Credentials", "true");
-//     res.header("Access-Control-Allow-Headers", "Origin,Content-Type, Authorization, x-id, Content-Length, X-Requested-With");
-//     res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-//     next();
-// });
+io.on('connection', (socket) => {
+  console.log('connected')
 
+  socket.on('disconnect', () => {
+    console.log('disconnected')
+  })
+
+
+})
 
 app.use((error, req, res, next) =>{
-    res.setHeader('Access-Control-Allow-Origin', CLIENT_ORIGIN);
+    res.setHeader(res.setHeader("Access-Control-Allow-Headers", "Authorization, Cache-Control, Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers"));
     let response
     if (process.env.NODE_ENV === 'production') {
       response = { error: { message: 'Server Error' }}
