@@ -21,7 +21,7 @@ app.use(cors({
 }))
 
 app.get('/', (req, res) => {
-    res.send('Hello, world! Welcome to the Get it to the Table API!')
+    res.status(200).json('Hello, world! Welcome to the Get it to the Table API!')
 })
 
 app.use('/bga', require('./routes/bga'))

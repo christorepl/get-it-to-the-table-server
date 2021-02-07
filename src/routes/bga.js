@@ -66,11 +66,15 @@ router.get('/user-lists/search', authorization, async (req, res) => {
             if (listAlreadyExists.rows.length > 0) {
                 return res.status(400).json({msg: 'You have already imported that list!'})
             }
+
             const response = await axios.request(options)
+
+            // console.log(response)
+
             bgaList.push(response.data.games[0].name)
         } catch (error) {
             console.error(error)
-            res.status(500).json({msg:'Server Error.'})
+            res.status(500).json({msg:'There was an error while fetching data from the Board Game Atlas API! Please try again soon.'})
         }
 
         await pool.query(

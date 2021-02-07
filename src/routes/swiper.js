@@ -1,73 +1,118 @@
 const express = require('express')
 const router = express.Router()
 const pool = require('../db')
+const tsReplace = require('ts-replace-all')
 const authorization = require('../middleware/authorization')
 
 router.get('/:group_id', authorization, async (req, res) => {
     try {
-
-        // const test = await pool.query(
-        //     "SELECT * FROM group_games WHERE group_id = $1 AND members LIKE ('%' || $2 || '%')", [req.params.group_id, req.user.id]
-        // )
-
         const user_id = req.user.id
+        const group_id = req.params.group_id
 
         const groupGames = await pool.query(
-            "SELECT game_bga_url, game_img_url, game_name, matched FROM group_games WHERE group_id = $1 AND swipers NOT LIKE ('%' || $2 || '%')", [req.params.group_id, user_id]
+            "SELECT game_bga_url, game_img_url, game_name, matched FROM group_games WHERE group_id = $1 AND swipers NOT LIKE ('%' || $2 || '%')", [group_id, user_id]
         )
 
-        console.log(groupGames.rows)
+        const groupMatchedGames = await pool.query(
+            'SELECT game_bga_url, game_name FROM group_games WHERE group_id = $1 AND matched = $2', [group_id, true]
+        )
 
-        res.json({data: {games: groupGames.rows}})
+        console.log(groupMatchedGames.rows)
 
-        // console.log(groupGames.rows)
+        res.json({data: {games: groupGames.rows, matchedGames: groupMatchedGames.rows}})
 
     } catch (error) {
-        console.error('try catch error')
+        console.error(error)
         res.status(500).json({msg: 'Server error.'})
     }
 })
 
 router.post('/:group_id', authorization, async (req, res) => {
-    const {game_name, swipe_direction} = req.headers
-    const user_id = req.user.id
-    // console.log(game_name, swipe_direction)
-    
-    const swiperList = await pool.query(
-        'SELECT swipers FROM group_games WHERE game_name = $1', [game_name]
-    )
+    try {
+        const {game_name, swipe_direction} = req.headers
+        const user_id = req.user.id
+        const group_id = req.params.group_id
 
-    // console.log(swiperList.rows[0].swipers)
+        const memberList = await pool.query(
+            'SELECT members FROM group_games WHERE game_name = $1 AND group_id = $2', [game_name, group_id]
+        )
 
-    const swipersObj = swiperList.rows[0].swipers
+        const membersObj = memberList.rows[0].members
+        
+        const membersString = membersObj.replaceAll('{', '').replaceAll('}', '').replaceAll('"', '')
 
-    // const fipsString = fips.replaceAll('"', '').replaceAll('{', '').replaceAll('}', '').replaceAll('[', '').replaceAll(']', '')
-    // const fipsIds = fipsString.split(',')
-    // let fipsArray = []
-    // for (let i = 0; i < fipsIds.length; i++){
-    //     fipsArray.push({"value": fipsIds[i]})
-    // }
-    
-    const swipersString = swipersObj.replace('{', '').replace('}', '')
+        let members = membersString.split(',')
 
-    let swipers = []
+        const swiperList = await pool.query(
+            'SELECT swipers FROM group_games WHERE game_name = $1 AND group_id = $2', [game_name, group_id]
+        )
 
-    if(swipersString) {
-        console.log('heya')
-        swipers.push(swipersString.split(','))
+        const swipersString = swiperList.rows[0].swipers.replaceAll('{', '').replaceAll('}', '').replaceAll('\\', '').replaceAll('"', '').replaceAll("'", '')
+
+        let swipersArray
+
+        if (swipersString) {
+            swipersArray = swipersString.split(',')
+        }
+
+        let swipers = []
+
+        if(swipersArray) {
+            for (let i = 0; i < swipersArray.length; i++) {
+                swipers.push(swipersArray[i])
+            }
+        }
+
+        swipers.push(user_id)
+
+        const swipeList = await pool.query(
+            'SELECT swipes FROM group_games WHERE game_name = $1 AND group_id = $2', [game_name, group_id]
+        )
+
+        const swipesString = swipeList.rows[0].swipes.replaceAll('{', '').replaceAll('}', '').replaceAll('\\', '').replaceAll('"', '').replaceAll("'", '')
+        
+        let swipesArray
+
+        if (swipesString) {
+            swipesArray = swipesString.split(',')
+        }
+
+        let swipes = []
+
+        if(swipesArray) {
+            for (let i = 0; i < swipesArray.length; i++) {
+                swipes.push(swipesArray[i])
+            }
+        }
+
+        swipes.push(swipe_direction)
+        
+        await pool.query(
+            'UPDATE group_games SET swipers = $1, swipes = $2 WHERE game_name = $3 AND group_id = $4 RETURNING *', [swipers, swipes, game_name, req.params.group_id]
+        )
+
+        //once members.length is equal to swipers.length, we have to decide to either delete the game from the table if anyone swiped left, or designate it a match and send a msg to the group
+
+        if(swipers.length === members.length) {
+            const anyoneSwipedLeft = swipes.filter(swipe => swipe === 'l')
+
+            if(anyoneSwipedLeft.length) {
+                await pool.query(
+                    'DELETE FROM group_games WHERE group_id = $1 AND game_name = $2', [group_id, game_name]
+                )
+            } else {
+                await pool.query(
+                    'UPDATE group_games SET matched = $1 WHERE game_name = $2 AND group_id = $3', [true, game_name, group_id]
+                )
+                res.json({msg: `Everyone in your group swiped right on "${game_name}!" You can now find it in your matched games list for this group.`}).status(200)
+            }
+        } else {
+            res.json({info: 'Swipe recorded'}).status(200)
+        }
+    } catch (error) {
+        console.error(error)
+        res.json({msg: 'Server Error'}).status(500)
     }
-
-    console.log(swipers)
-
-    swipers.push(req.user.id)
-    
-    const test = await pool.query(
-        "UPDATE group_games SET swipers = $1 WHERE game_name = $2 AND group_id = $3 RETURNING *", [swipers, game_name, req.params.group_id]
-    )
-
-    res.json('love ya')
-
-    // console.log(test.rows)
 
 })
 

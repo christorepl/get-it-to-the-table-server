@@ -9,7 +9,7 @@ CREATE TABLE group_games (
     FOREIGN KEY (members) REFERENCES user_groups(members),
     swipes TEXT NOT NULL DEFAULT '{}',
     swipers TEXT NOT NULL DEFAULT '{}',
-    matched BOOLEAN DEFAULT false,
+    matched BOOLEAN NOT NULL DEFAULT false,
     game_name TEXT NOT NULL,
     game_img_url TEXT NOT NULL,
     game_bga_url TEXT NOT NULL

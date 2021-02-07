@@ -74,8 +74,10 @@ router.get('/verify', authorization, async (req, res) => {
 
       const { user_name, user_id } = user.rows[0]
       
+      // "SELECT members FROM user_groups WHERE members LIKE ('%' || $1 || '%') AND owner_id = $2"
+
       const userGroups = await pool.query(
-        'SELECT group_name, group_id FROM user_groups WHERE user_groups.owner_id = $1', [user_id]
+        "SELECT group_name, group_id FROM user_groups WHERE members LIKE ('%' || $1 || '%')", [user_id]
       )
 
       // const userMemberGroups = await pool.query(
@@ -107,44 +109,43 @@ router.get('/verify', authorization, async (req, res) => {
       }
     }
           
-      const userContacts = await pool.query(
-        'SELECT contact_name, contact_id FROM contacts WHERE user_id = $1', [user_id]
-      )
+    const userContacts = await pool.query(
+      'SELECT contact_name, contact_id FROM contacts WHERE user_id = $1', [user_id]
+    )
   
-      const contactData = userContacts.rows
-      
-      let contacts = []
-        for (const [key, val] of Object.entries(contactData)) {
-          var obj = {}
-          if (key) {
-          obj['label'] = val.contact_name
-          obj['value'] = val.contact_id
-          contacts.push(obj)
-          }
-      }
+    const contactData = userContacts.rows
+    
+    let contacts = []
+      for (const [key, val] of Object.entries(contactData)) {
+        var obj = {}
+        if (key) {
+        obj['label'] = val.contact_name
+        obj['value'] = val.contact_id
+        contacts.push(obj)
+        }
+    }
 
-      const userLists = await pool.query(
-        'SELECT list_name, list_id FROM user_lists WHERE user_id = $1', [user_id]
-      )
+    const userLists = await pool.query(
+      'SELECT list_name, list_id FROM user_lists WHERE user_id = $1', [user_id]
+    )
 
-      const listData = userLists.rows
-      
-      let lists = []
-        for (const [key, val] of Object.entries(listData)) {
-          var obj = {}
-          if (key) {
-          obj['label'] = val.list_name
-          obj['value'] = val.list_id
-          lists.push(obj)
-          }
-      }
+    const listData = userLists.rows
+    
+    let lists = []
+      for (const [key, val] of Object.entries(listData)) {
+        var obj = {}
+        if (key) {
+        obj['label'] = val.list_name
+        obj['value'] = val.list_id
+        lists.push(obj)
+        }
+    }
 
-
-      res.json({user_name, user_id, status: true, groups, contacts, lists}).status(200)
+    res.json({user_name, user_id, status: true, groups, contacts, lists}).status(200)
 
     } catch (error) {
       console.error(error.message)
-      res.status(500).send('Server error')
+      res.status(500).json({msg:'Server error'})
     }
 })
   
