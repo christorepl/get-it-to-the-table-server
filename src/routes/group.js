@@ -2,6 +2,7 @@ const express = require('express')
 const router = express.Router()
 const pool = require('../db')
 const axios = require('axios')
+const tsReplace = require('ts-replace-all')
 const { CLIENT_ID } = require('../config')
 const authorization = require('../middleware/authorization')
 
@@ -50,7 +51,8 @@ router.post('/add_list', authorization, async (req, res) => {
         try {
             const response = await axios.request(options)
 
-            response.data.games.map(game => gameNames.push(game.name))
+            //the BGA api randomly uses a non standard minus sign/ dash ( – ) compare to the standard one ( – - ). it causes errors when swiping.
+            response.data.games.map(game => gameNames.push(game.name.replaceAll('–', '-')))
             response.data.games.map(game => gameImgs.push(game.images.medium))
             response.data.games.map(game => gameURLs.push(game.url))
 
