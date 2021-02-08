@@ -41,7 +41,7 @@ io.on('connection', (socket) => {
 })
 
 app.use((error, req, res, next) =>{
-    res.setHeader(res.setHeader("Access-Control-Allow-Headers", "Authorization, Cache-Control, Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers"));
+  res.setHeader('Access-Control-Allow-Origin', CLIENT_ORIGIN);
     let response
     if (process.env.NODE_ENV === 'production') {
       response = { error: { message: 'Server Error' }}

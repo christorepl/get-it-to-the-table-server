@@ -17,8 +17,6 @@ router.get('/:group_id', authorization, async (req, res) => {
             'SELECT game_bga_url, game_name FROM group_games WHERE group_id = $1 AND matched = $2', [group_id, true]
         )
 
-        console.log(groupMatchedGames.rows)
-
         res.json({data: {games: groupGames.rows, matchedGames: groupMatchedGames.rows}})
 
     } catch (error) {
