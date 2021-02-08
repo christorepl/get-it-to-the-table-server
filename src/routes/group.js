@@ -51,23 +51,25 @@ router.post('/add_list', authorization, async (req, res) => {
         try {
             const response = await axios.request(options)
 
-            //the BGA api randomly uses a non standard minus sign/ dash ( – ) compare to the standard one ( – - ). it causes errors when swiping.
+            //the BGA api randomly uses a non standard minus sign/ dash ( – ) compare to the standard one ( – - ). it causes fetch errors client side when swiping.
             response.data.games.map(game => gameNames.push(game.name.replaceAll('–', '-')))
             response.data.games.map(game => gameImgs.push(game.images.medium))
             response.data.games.map(game => gameURLs.push(game.url))
 
             for (let i = 0; i < gameNames.length; i++) {
-                const insertedGames = await pool.query(
+                await pool.query(
                     'INSERT INTO group_games (owner_id, group_id, members, game_name, game_bga_url, game_img_url) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *', [req.user.id, group_id[0], members, gameNames[i], gameURLs[i], gameImgs[i]]
                 )
             }
+
+            res.status(201).json({msg: 'Games added to group. Now you can swipe on these games in the group you just selected!'})
 
             //this query deletes duplicate game entries. BGA lists allow games to be duplicated
             await pool.query(
                 'DELETE FROM group_games USING group_games duplicates WHERE group_games.id < duplicates.id AND group_games.game_name = duplicates.game_name AND group_games.group_id = $1', [group_id[0]]
             )
 
-            return res.status(201).json({msg: 'Games added to group. Now you can swipe on these games in the group you just selected!'})
+            return
 
         } catch (error) {
             console.error(error)

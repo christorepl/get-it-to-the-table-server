@@ -32,15 +32,15 @@ router.post('/', authorization, async (req, res) => {
             return
         }
 
-        const createContact = await pool.query(
+        await pool.query(
             'INSERT INTO contacts (user_id, contact_id, contact_name) VALUES ($1, $2, $3) RETURNING contact_id, contact_name', [req.user.id, contact_id, contact_name]
         )
         
-        res.json({msg: 'Contact added!', newContact: createContact.rows[0]})
+        return res.json({msg: 'Contact added!'})
 
     } catch(error) {
         res.json({msg:'Bad new contact data! Please check the contact ID.'})
-        console.error(error.message, 'in the contacts route')
+        console.error(error.message)
     }
 })
 

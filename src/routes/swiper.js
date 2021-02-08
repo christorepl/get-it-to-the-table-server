@@ -25,9 +25,9 @@ router.get('/:group_id', authorization, async (req, res) => {
     }
 })
 
-router.post('/:group_id', authorization, async (req, res) => {
+router.put('/:group_id', authorization, async (req, res) => {
     try {
-        const {game_name, swipe_direction} = req.headers
+        const { game_name, swipe_direction } = req.headers
         const user_id = req.user.id
         const group_id = req.params.group_id
 
@@ -86,7 +86,7 @@ router.post('/:group_id', authorization, async (req, res) => {
         swipes.push(swipe_direction)
         
         await pool.query(
-            'UPDATE group_games SET swipers = $1, swipes = $2 WHERE game_name = $3 AND group_id = $4 RETURNING *', [swipers, swipes, game_name, req.params.group_id]
+            'UPDATE group_games SET swipers = $1, swipes = $2 WHERE game_name = $3 AND group_id = $4', [swipers, swipes, game_name, req.params.group_id]
         )
 
         //once members.length is equal to swipers.length, we have to decide to either delete the game from the table if anyone swiped left, or designate it a match and send a msg to the group
@@ -102,7 +102,7 @@ router.post('/:group_id', authorization, async (req, res) => {
                 await pool.query(
                     'UPDATE group_games SET matched = $1 WHERE game_name = $2 AND group_id = $3', [true, game_name, group_id]
                 )
-                res.json({msg: `Everyone in your group swiped right on "${game_name}!" You can now find it in your matched games list for this group.`}).status(200)
+                res.json({msg: `Everyone in your group swiped right on ${game_name}! You can now find it in your matched games list for this group.`}).status(200)
             }
         } else {
             res.json({info: 'Swipe recorded'}).status(200)
