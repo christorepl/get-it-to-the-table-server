@@ -4,10 +4,6 @@ const morgan = require('morgan')
 const cors = require('cors')
 const helmet = require('helmet')
 const app = express()
-const http = require('http')
-const server = http.createServer(app)
-const socketio = require('socket.io')
-const io = socketio(server)
 const { NODE_ENV, CLIENT_ORIGIN } = require('./config')
 const morganOption = (NODE_ENV === 'production')
   ? 'tiny'
@@ -29,16 +25,6 @@ app.use('/auth', require('./routes/jwtAuth'))
 app.use('/contacts', require('./routes/contacts'))
 app.use('/group', require ('./routes/group'))
 app.use('/swiper', require ('./routes/swiper'))
-
-io.on('connection', (socket) => {
-  console.log('connected')
-
-  socket.on('disconnect', () => {
-    console.log('disconnected')
-  })
-
-
-})
 
 app.use((error, req, res, next) =>{
   res.setHeader('Access-Control-Allow-Origin', CLIENT_ORIGIN);
