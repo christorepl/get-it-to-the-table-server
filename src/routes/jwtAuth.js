@@ -72,33 +72,16 @@ router.get('/verify', authorization, async (req, res) => {
     try {
       const user = await pool.query('SELECT user_name, user_id FROM users WHERE user_id = $1', [req.user.id])
 
+      if (user.rows.length > 0) {
       const { user_name, user_id } = user.rows[0]
       
-      // "SELECT members FROM user_groups WHERE members LIKE ('%' || $1 || '%') AND owner_id = $2"
-
       const userGroups = await pool.query(
         "SELECT group_name, group_id FROM user_groups WHERE members LIKE ('%' || $1 || '%')", [user_id]
       )
-
-      // const userMemberGroups = await pool.query(
-      //   'SELECT group_name, group_id FROM user_groups WHERE members LIKE owner_id'
-      // )
-
-      // const groupMemberData = userMemberGroups.rows
-      // console.log(groupMemberData)
       
       let groups = []
-      //   for (const [key, val] of Object.entries(groupMemberData)) {
-      //     var obj = {}
-      //     if (key) {
-      //     obj['label'] = val.group_name
-      //     obj['value'] = val.id
-      //     groups.push(obj)
-      //   }
-      // }
 
       const groupData = userGroups.rows
-      // console.log(groupData)
 
       for (const [key, val] of Object.entries(groupData)) {
         var obj = {}
@@ -142,11 +125,30 @@ router.get('/verify', authorization, async (req, res) => {
     }
 
     res.json({user_name, user_id, status: true, groups, contacts, lists}).status(200)
-
+  } else {
+    res.status(401).json({msg: 'Not an authorized user'})
+  }
     } catch (error) {
       console.error(error.message)
       res.status(500).json({msg:'Server error'})
     }
 })
   
+
+router.delete('/delete-account', authorization, async (req, res) => {
+  try {
+
+    await pool.query(
+      'DELETE FROM users WHERE user_id = $1 AND user_email = $2', [req.user.id, req.body.email]
+    )
+
+
+    res.status(200).json({msg: 'Your account has been deleted.'})
+    // res.status(200).json({msg: 'Your account has been deleted. Redirecting you to the homepage now.'})
+
+  } catch (error) {
+    res.status(500).json({msg: 'Server error'})
+  }
+})
+
 module.exports = router

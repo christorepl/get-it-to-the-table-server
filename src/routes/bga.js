@@ -39,6 +39,10 @@ let client_id = CLIENT_ID
 // })
 
 router.get('/user-lists/search', authorization, async (req, res) => {
+
+
+
+
     const list_id = req.query.list_id
     const list_name = req.headers.list_name
     const user_id = req.user.id
@@ -55,8 +59,6 @@ router.get('/user-lists/search', authorization, async (req, res) => {
         }
     }
 
-    let bgaList = []
-
     const getBGAList = async () => {
         try {
             const listAlreadyExists = await pool.query(
@@ -71,7 +73,6 @@ router.get('/user-lists/search', authorization, async (req, res) => {
 
             // console.log(response)
 
-            bgaList.push(response.data.games[0].name)
         } catch (error) {
             console.error(error)
             res.status(500).json({msg:'There was an error while fetching data from the Board Game Atlas API! Please try again soon.'})
