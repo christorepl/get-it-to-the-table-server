@@ -20,7 +20,7 @@ router.get('/:group_id', authorization, async (req, res) => {
         res.json({data: {games: groupGames.rows, matchedGames: groupMatchedGames.rows}})
 
     } catch (error) {
-        console.error(error)
+        console.error(error.message)
         res.status(500).json({msg: 'Server error.'})
     }
 })
@@ -34,12 +34,20 @@ router.put('/:group_id', authorization, async (req, res) => {
         const memberList = await pool.query(
             'SELECT members FROM group_games WHERE game_name = $1 AND group_id = $2', [game_name, group_id]
         )
-
-        const membersObj = memberList.rows[0].members
         
-        const membersString = membersObj.replaceAll('{', '').replaceAll('}', '').replaceAll('"', '')
+        let members
 
-        let members = membersString.split(',')
+        if (memberList.rows.length > 0) {
+
+            const membersObj = memberList.rows[0].members
+            
+            const membersString = membersObj.replaceAll('{', '').replaceAll('}', '').replaceAll('"', '')
+    
+            members = membersString.split(',')
+        } else {
+            res.json({msg: 'Group does not exist!'}).status(400)
+        }
+        
 
         const swiperList = await pool.query(
             'SELECT swipers FROM group_games WHERE game_name = $1 AND group_id = $2', [game_name, group_id]
@@ -108,7 +116,7 @@ router.put('/:group_id', authorization, async (req, res) => {
             res.json({info: 'Swipe recorded'}).status(200)
         }
     } catch (error) {
-        console.error(error)
+        console.error(error.message)
         res.json({msg: 'Server Error'}).status(500)
     }
 

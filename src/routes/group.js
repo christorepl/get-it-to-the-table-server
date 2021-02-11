@@ -72,7 +72,7 @@ router.post('/add_list', authorization, async (req, res) => {
             return
 
         } catch (error) {
-            console.error(error)
+            console.error(error.message)
             res.status(500).json({msg:'Server Error.'})
         }
         
@@ -81,7 +81,7 @@ router.post('/add_list', authorization, async (req, res) => {
     getBGAList()
 
     } catch (error) {
-        console.error(error)
+        console.error(error.message)
         res.status(500).json({msg: 'Server error'})
     }
 })

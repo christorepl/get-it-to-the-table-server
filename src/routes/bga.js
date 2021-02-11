@@ -1,48 +1,12 @@
 const router = require('express').Router()
-const { CLIENT_ID, CLIENT_SECRET, REDIRECT_URI, GRANT_TYPE } = require('../config')
+const { CLIENT_ID } = require('../config')
 const axios = require('axios')
 const pool = require('../db')
-// const qs = require('qs')
 const authorization = require('../middleware/authorization')
-// const authURL = 'https://api.boardgameatlas.com/oauth/token'
 
 let client_id = CLIENT_ID
-// let client_secret = CLIENT_SECRET
-// let redirect_uri = REDIRECT_URI
-// let grant_type = GRANT_TYPE
-
-// router.post('/auth', (req, res, next) => {
-//     console.log('request received')
-//     console.log('here is the body', req.body.code)
-//     console.log('that was req.body.code')
-//     let code = req.body.code
-//     axios({
-//         method: 'POST',
-//         url: authURL,
-//         data: qs.stringify({
-//             code,
-//             client_id,
-//             client_secret,
-//             redirect_uri,
-//             grant_type
-//         }),
-//         headers: {
-//             'content-type' : 'application/x-www-form-urlencoded'
-//         }
-//     }).then(response => {
-//         console.log(response.data)
-//         res.json(response.data)
-//     }).catch(error => {
-//         console.log(error)
-//         res.json(error)
-//     })
-// })
 
 router.get('/user-lists/search', authorization, async (req, res) => {
-
-
-
-
     const list_id = req.query.list_id
     const list_name = req.headers.list_name
     const user_id = req.user.id
@@ -69,12 +33,10 @@ router.get('/user-lists/search', authorization, async (req, res) => {
                 return res.status(400).json({msg: 'You have already imported that list!'})
             }
 
-            const response = await axios.request(options)
-
-            // console.log(response)
+            await axios.request(options)
 
         } catch (error) {
-            console.error(error)
+            console.error(error.message)
             res.status(500).json({msg:'There was an error while fetching data from the Board Game Atlas API! Please try again soon.'})
         }
 
