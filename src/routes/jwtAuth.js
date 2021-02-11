@@ -147,7 +147,7 @@ router.delete('/delete-account', authorization, async (req, res) => {
     // res.status(200).json({msg: 'Your account has been deleted. Redirecting you to the homepage now.'})
 
   } catch (error) {
-    res.status(500).json({msg: 'Server error'})
+    res.status(500).json({msg: 'Server error. Try checking your email address for typos.'})
   }
 })
 

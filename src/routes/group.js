@@ -8,7 +8,6 @@ const authorization = require('../middleware/authorization')
 
 let client_id = CLIENT_ID
 
-
 router.post('/add_list', authorization, async (req, res) => {
     try {
     let { group_id, list_id } = req.body
@@ -18,7 +17,7 @@ router.post('/add_list', authorization, async (req, res) => {
     )
 
     if(groupListExists.rows.length > 0) {
-        return res.json({msg: 'That group already has that list in it!'})
+        return res.status(400).json({msg: 'That group already has that list in it!'})
     }
 
     await pool.query(

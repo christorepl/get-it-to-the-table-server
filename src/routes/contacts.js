@@ -4,17 +4,6 @@ const router = express.Router()
 const authorization = require('../middleware/authorization')
 const pool = require('../db')
 
-router.get('/', authorization, async (req, res) => {
-    try {
-        const allContacts = await pool.query(
-            'SELECT contact_name, contact_id FROM contacts WHERE user_id = $1', [req.user.id]
-        )
-        res.json(allContacts)
-    } catch (error) {
-        console.error(error.message)
-    }
-})
-
 router.post('/', authorization, async (req, res) => {
     try {
         const { contact_name, contact_id } = req.body
@@ -36,10 +25,10 @@ router.post('/', authorization, async (req, res) => {
             'INSERT INTO contacts (user_id, contact_id, contact_name) VALUES ($1, $2, $3) RETURNING contact_id, contact_name', [req.user.id, contact_id, contact_name]
         )
         
-        return res.json({msg: 'Contact added!'})
+        return res.status(200).json({msg: 'Contact added!'})
 
     } catch(error) {
-        res.json({msg:'Bad new contact data! Please check the contact ID.'})
+        res.status(500).json({msg:'Bad new contact data! Please check the contact ID.'})
         console.error(error.message)
     }
 })
