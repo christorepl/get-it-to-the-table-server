@@ -15,7 +15,7 @@ router.get("/:group_id", authorization, async (req, res) => {
     );
 
     const groupMatchedGames = await pool.query(
-      "SELECT game_bga_url, game_name FROM group_games WHERE group_id = $1 AND matched = $2",
+      "SELECT game_bga_url, game_name, game_img_url FROM group_games WHERE group_id = $1 AND matched = $2",
       [group_id, true]
     );
 

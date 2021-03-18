@@ -154,7 +154,7 @@ router.post("/create", authorization, async (req, res) => {
 
     return res
       .json({
-        msg: "Group created! Add a list to your group and get to swiping!",
+        msg: "Group created",
         type: "SUCCESS",
       })
       .status(201);
