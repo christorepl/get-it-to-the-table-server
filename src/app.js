@@ -20,7 +20,7 @@ app.get("/", (req, res) => {
   res.status(200).json("Hello, world! Welcome to the Get it to the Table API!");
 });
 
-app.use("/bga", require("./routes/bga"));
+app.use("/bgg", require("./routes/bgg"));
 app.use("/auth", require("./routes/jwtAuth"));
 app.use("/contacts", require("./routes/contacts"));
 app.use("/group", require("./routes/group"));
@@ -40,10 +40,10 @@ app.use((error, req, res, next) => {
 app.use(function errorHandler(error, req, res, next) {
   let response;
   if (NODE_ENV === "production") {
-    response = { msg: "Server error" };
+    response = { msg: "Server error", type: "DANGER" };
   } else {
     console.error(error.message);
-    response = { msg: error.message };
+    response = { msg: error.message, type: "DANGER" };
   }
   res.status(500).json(response);
 });

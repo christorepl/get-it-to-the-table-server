@@ -136,20 +136,20 @@ router.get("/verify", authorization, async (req, res) => {
         }
       }
 
-      const userLists = await pool.query(
-        "SELECT list_name, list_id FROM user_lists WHERE user_id = $1",
+      const userCollections = await pool.query(
+        "SELECT collection_name, bgg_username FROM user_collections WHERE user_id = $1",
         [user_id]
       );
 
-      const listData = userLists.rows;
+      const collectionData = userCollections.rows;
 
-      let lists = [];
-      for (const [key, val] of Object.entries(listData)) {
+      let collections = [];
+      for (const [key, val] of Object.entries(collectionData)) {
         var obj = {};
         if (key) {
-          obj["label"] = val.list_name;
-          obj["value"] = val.list_id;
-          lists.push(obj);
+          obj["label"] = val.collection_name;
+          obj["value"] = val.bgg_username;
+          collections.push(obj);
         }
       }
 
@@ -162,7 +162,7 @@ router.get("/verify", authorization, async (req, res) => {
           status: true,
           groups,
           contacts,
-          lists,
+          collections,
         })
         .status(200);
     } else {

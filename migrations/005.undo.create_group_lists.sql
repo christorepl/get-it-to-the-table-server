@@ -1,1 +1,1 @@
-DROP TABLE IF EXISTS group_lists;
+DROP TABLE IF EXISTS group_collections;

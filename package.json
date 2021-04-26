@@ -39,7 +39,8 @@
     "qs": "^6.9.4",
     "sequelize": "^6.3.5",
     "ts-replace-all": "^1.0.0",
-    "uuid": "^8.3.1"
+    "uuid": "^8.3.1",
+    "xml2js": "^0.4.23"
   },
   "devDependencies": {
     "chai": "^4.2.0",

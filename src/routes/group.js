@@ -2,30 +2,28 @@ const express = require("express");
 const router = express.Router();
 const pool = require("../db");
 const axios = require("axios");
-const tsReplace = require("ts-replace-all");
-const { CLIENT_ID } = require("../config");
+const xml2js = require("xml2js");
 const authorization = require("../middleware/authorization");
 
-let client_id = CLIENT_ID;
-
-router.post("/add_list", authorization, async (req, res) => {
+router.post("/add_collection", authorization, async (req, res) => {
   try {
-    let { group_id, list_id } = req.body;
+    let { group_id, bgg_username } = req.body;
 
-    const groupListExists = await pool.query(
-      "SELECT group_id FROM group_lists WHERE group_id = $1 AND list_id = $2",
-      [group_id[0], list_id[0]]
+    const groupCollectionExists = await pool.query(
+      "SELECT group_id FROM group_collections WHERE group_id = $1 AND bgg_username = $2",
+      [group_id[0], bgg_username[0]]
     );
 
-    if (groupListExists.rows.length > 0) {
-      return res
-        .status(400)
-        .json({ msg: "That group already has that list in it!", type: "INFO" });
+    if (groupCollectionExists.rows.length > 0) {
+      return res.status(400).json({
+        msg: "That group already has that collection in it!",
+        type: "INFO",
+      });
     }
 
     await pool.query(
-      "INSERT INTO group_lists (group_id, list_id, owner_id) VALUES ($1, $2, $3)",
-      [group_id[0], list_id[0], req.user.id]
+      "INSERT INTO group_collections (group_id, bgg_username, owner_id) VALUES ($1, $2, $3)",
+      [group_id[0], bgg_username[0], req.user.id]
     );
 
     const groupMembers = await pool.query(
@@ -37,67 +35,65 @@ router.post("/add_list", authorization, async (req, res) => {
 
     var options = {
       method: "GET",
-      url: "https://www.boardgameatlas.com/api/search",
-      params: {
-        client_id,
-        list_id: list_id[0],
-      },
-      headers: {
-        "content-type": "application/json",
-      },
+      url: `https://www.boardgamegeek.com/xmlapi/collection/${bgg_username}`,
     };
 
     let gameNames = [];
     let gameImgs = [];
     let gameURLs = [];
 
-    const getBGAList = async () => {
-      try {
-        const response = await axios.request(options);
+    try {
+      const results = await axios.request(options);
 
-        //the BGA api randomly uses a non standard minus sign/ dash ( – ) compare to the standard one ( – - ). it causes fetch errors client side when swiping.
-        response.data.games.map((game) =>
-          gameNames.push(game.name.replaceAll("–", "-"))
-        );
-        response.data.games.map((game) => gameImgs.push(game.images.medium));
-        response.data.games.map((game) => gameURLs.push(game.url));
+      let xml = results.data;
 
-        for (let i = 0; i < gameNames.length; i++) {
-          await pool.query(
-            "INSERT INTO group_games (owner_id, group_id, members, game_name, game_bga_url, game_img_url) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
-            [
-              req.user.id,
-              group_id[0],
-              members,
-              gameNames[i],
-              gameURLs[i],
-              gameImgs[i],
-            ]
-          );
-        }
+      let result;
 
-        res.status(201).json({
-          msg: "Games added to group. Start swiping!",
-          type: "SUCCESS",
-        });
+      xml2js.parseString(xml, { mergeAttrs: true }, async (err, newObject) => {
+        if (err) throw err;
+        result = newObject;
+      });
 
-        //this query deletes duplicate game entries. BGA lists allow games to be duplicated
-        await pool.query(
-          "DELETE FROM group_games USING group_games duplicates WHERE group_games.id < duplicates.id AND group_games.game_name = duplicates.game_name AND group_games.group_id = $1",
-          [group_id[0]]
-        );
-
-        return;
-      } catch (error) {
-        console.error(error.message);
-        res.status(500).json({
-          msg: "There was an error processing your request.",
-          type: "DANGER",
-        });
+      if (result.errors) {
+        return res
+          .status(400)
+          .json({ msg: result.errors.error[0].message, type: "WARNING" });
       }
-    };
 
-    getBGAList();
+      let games = result.items["item"];
+
+      //the BGG api randomly uses a non standard minus sign/ dash ( – ) compare to the standard one ( – - ). it causes fetch errors client side when swiping.
+      games.map((game) => gameNames.push(game.name[0]["_"].replace(/–/g, `-`)));
+      games.map((game) => gameImgs.push(game.image[0]));
+      games.map((game) =>
+        gameURLs.push(`https://boardgamegeek.com/boardgame/${game.objectid}`)
+      );
+
+      for (let i = 0; i < gameNames.length; i++) {
+        await pool.query(
+          "INSERT INTO group_games (owner_id, group_id, members, game_name, game_bgg_url, game_img_url) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
+          [
+            req.user.id,
+            group_id[0],
+            members,
+            gameNames[i],
+            gameURLs[i],
+            gameImgs[i],
+          ]
+        );
+      }
+
+      return res.status(201).json({
+        msg: "Games added to group. Start swiping!",
+        type: "SUCCESS",
+      });
+    } catch (error) {
+      console.error(error.message);
+      res.status(500).json({
+        msg: "There was an error processing your request.",
+        type: "DANGER",
+      });
+    }
   } catch (error) {
     console.error(error.message);
     res.status(500).json({

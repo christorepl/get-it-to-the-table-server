@@ -10,12 +10,12 @@ router.get("/:group_id", authorization, async (req, res) => {
     const group_id = req.params.group_id;
 
     const groupGames = await pool.query(
-      "SELECT game_bga_url, game_img_url, game_name, matched FROM group_games WHERE group_id = $1 AND swipers NOT LIKE ('%' || $2 || '%')",
+      "SELECT game_bgg_url, game_img_url, game_name, matched FROM group_games WHERE group_id = $1 AND swipers NOT LIKE ('%' || $2 || '%')",
       [group_id, user_id]
     );
 
     const groupMatchedGames = await pool.query(
-      "SELECT game_bga_url, game_name, game_img_url FROM group_games WHERE group_id = $1 AND matched = $2",
+      "SELECT game_bgg_url, game_name, game_img_url FROM group_games WHERE group_id = $1 AND matched = $2",
       [group_id, true]
     );
 
@@ -51,13 +51,11 @@ router.put("/:group_id", authorization, async (req, res) => {
 
     const members = membersString.split(",");
 
-    console.log(game_name, group_id);
     const swiperList = await pool.query(
       "SELECT swipers FROM group_games WHERE game_name = $1 AND group_id = $2",
       [game_name, group_id]
     );
 
-    console.log(swiperList.rows);
     const swipersString = swiperList.rows[0].swipers
       .replaceAll("{", "")
       .replaceAll("}", "")
@@ -131,8 +129,8 @@ router.put("/:group_id", authorization, async (req, res) => {
         );
         res
           .json({
-            msg: ` You can now find ${game_name} in your matched games list for this group.`,
-            type: "MATCHED",
+            msg: `You can now find ${game_name} in your matched games list for this group.`,
+            type: "SUCCESS",
           })
           .status(200);
       }

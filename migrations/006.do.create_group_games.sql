@@ -9,5 +9,5 @@ CREATE TABLE group_games (
     matched BOOLEAN NOT NULL DEFAULT false,
     game_name TEXT NOT NULL,
     game_img_url TEXT NOT NULL,
-    game_bga_url TEXT NOT NULL
+    game_bgg_url TEXT NOT NULL
 );
