@@ -5,7 +5,7 @@ const pool = require("../db");
 const authorization = require("../middleware/authorization");
 
 router.post("/add-collection", authorization, async (req, res) => {
-  const { bgg_username, collection_name } = req.headers;
+  const { bgg_username, list_name } = req.headers;
 
   var options = {
     method: "GET",
@@ -26,8 +26,8 @@ router.post("/add-collection", authorization, async (req, res) => {
     }
 
     const nameAlreadyExists = await pool.query(
-      "SELECT collection_name FROM user_lists WHERE user_id = $1 AND collection_name = $2",
-      [req.user.id, collection_name]
+      "SELECT list_name FROM user_lists WHERE user_id = $1 AND list_name = $2",
+      [req.user.id, list_name]
     );
 
     if (nameAlreadyExists.rows.length > 0) {
@@ -61,12 +61,12 @@ router.post("/add-collection", authorization, async (req, res) => {
       });
     }
     await pool.query(
-      "INSERT INTO user_lists (user_id, collection_name, bgg_username) VALUES ($1, $2, $3)",
-      [req.user.id, collection_name, bgg_username]
+      "INSERT INTO user_lists (user_id, list_name, bgg_username) VALUES ($1, $2, $3)",
+      [req.user.id, list_name, bgg_username]
     );
 
     const userCollections = await pool.query(
-      "SELECT collection_name, bgg_username FROM user_lists WHERE user_id = $1",
+      "SELECT list_name, bgg_username FROM user_lists WHERE user_id = $1",
       [req.user.id]
     );
 
@@ -76,7 +76,7 @@ router.post("/add-collection", authorization, async (req, res) => {
     for (const [key, val] of Object.entries(collectionData)) {
       var obj = {};
       if (key) {
-        obj["label"] = val.collection_name;
+        obj["label"] = val.list_name;
         obj["value"] = val.bgg_username;
         collections.push(obj);
       }
