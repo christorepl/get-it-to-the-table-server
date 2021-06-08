@@ -139,9 +139,9 @@ Endpoint for adding BGG collections to user account.
 
 ##### Request Body
 
-| Type | Fields                           | Description                                                            |
-| ---- | -------------------------------- | ---------------------------------------------------------------------- |
-| JSON | list_name, bgg_username, user.id | JSON containing user id, BGG username and user defined collection name |
+| Type | Fields                                 | Description                                                            |
+| ---- | -------------------------------------- | ---------------------------------------------------------------------- |
+| JSON | collection_name, bgg_username, user.id | JSON containing user id, BGG username and user defined collection name |
 
 ##### Responses
 

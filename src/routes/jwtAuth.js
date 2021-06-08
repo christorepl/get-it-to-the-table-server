@@ -137,7 +137,7 @@ router.get("/verify", authorization, async (req, res) => {
       }
 
       const userCollections = await pool.query(
-        "SELECT list_name, bgg_username FROM user_lists WHERE user_id = $1",
+        "SELECT collection_name, bgg_username FROM user_lists WHERE user_id = $1",
         [user_id]
       );
 
@@ -147,7 +147,7 @@ router.get("/verify", authorization, async (req, res) => {
       for (const [key, val] of Object.entries(collectionData)) {
         var obj = {};
         if (key) {
-          obj["label"] = val.list_name;
+          obj["label"] = val.collection_name;
           obj["value"] = val.bgg_username;
           collections.push(obj);
         }
