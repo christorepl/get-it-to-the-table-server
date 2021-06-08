@@ -14,7 +14,7 @@ router.post("/add-collection", authorization, async (req, res) => {
 
   try {
     const collectionAlreadyExists = await pool.query(
-      "SELECT bgg_username FROM user_collections WHERE user_id = $1 AND bgg_username = $2",
+      "SELECT bgg_username FROM user_lists WHERE user_id = $1 AND bgg_username = $2",
       [req.user.id, bgg_username]
     );
 
@@ -26,7 +26,7 @@ router.post("/add-collection", authorization, async (req, res) => {
     }
 
     const nameAlreadyExists = await pool.query(
-      "SELECT collection_name FROM user_collections WHERE user_id = $1 AND collection_name = $2",
+      "SELECT collection_name FROM user_lists WHERE user_id = $1 AND collection_name = $2",
       [req.user.id, collection_name]
     );
 
@@ -61,12 +61,12 @@ router.post("/add-collection", authorization, async (req, res) => {
       });
     }
     await pool.query(
-      "INSERT INTO user_collections (user_id, collection_name, bgg_username) VALUES ($1, $2, $3)",
+      "INSERT INTO user_lists (user_id, collection_name, bgg_username) VALUES ($1, $2, $3)",
       [req.user.id, collection_name, bgg_username]
     );
 
     const userCollections = await pool.query(
-      "SELECT collection_name, bgg_username FROM user_collections WHERE user_id = $1",
+      "SELECT collection_name, bgg_username FROM user_lists WHERE user_id = $1",
       [req.user.id]
     );
 
@@ -89,8 +89,7 @@ router.post("/add-collection", authorization, async (req, res) => {
   } catch (error) {
     console.error(error.message);
     res.status(500).json({
-      msg:
-        "There was an error while fetching data from the Board Game Geek Server. Please try again soon.",
+      msg: "There was an error while fetching data from the Board Game Geek Server. Please try again soon.",
       type: "WARNING",
     });
   }

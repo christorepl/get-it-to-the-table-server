@@ -137,7 +137,7 @@ router.get("/verify", authorization, async (req, res) => {
       }
 
       const userCollections = await pool.query(
-        "SELECT collection_name, bgg_username FROM user_collections WHERE user_id = $1",
+        "SELECT collection_name, bgg_username FROM user_lists WHERE user_id = $1",
         [user_id]
       );
 
