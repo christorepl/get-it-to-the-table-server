@@ -54,6 +54,8 @@ router.post("/add-collection", authorization, async (req, res) => {
         .json({ msg: result.errors.error[0].message, type: "WARNING" });
     }
 
+    console.log(result);
+
     if (result.items.totalitems && result.items.totalitems[0] == 0) {
       return res.status(400).json({
         msg: "That user does not have any games in their collection",
